@@ -3,6 +3,7 @@ import IRestaurante from '../../../interfaces/IRestaurante';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import axios from 'axios';
 import { IPaginacao } from '../../../interfaces/IPaginacao';
+import { Link } from 'react-router-dom';
 
 const AdministracaoRestaurante = () => {
 
@@ -26,6 +27,9 @@ useEffect(() => {
                         <TableCell>
                             Nome
                         </TableCell>
+                        <TableCell>
+                            Editar
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -33,8 +37,10 @@ useEffect(() => {
                         <TableCell>
                             {restaurante.nome}
                         </TableCell>
+                        <TableCell>
+                            [<Link to={`/admin/restaurantes/${restaurante.id}`}>Editar</Link>]
+                        </TableCell>
                     </TableRow>)}
-                    
                 </TableBody>
             </Table>
         </TableContainer>
