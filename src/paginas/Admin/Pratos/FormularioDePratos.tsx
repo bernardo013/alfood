@@ -1,0 +1,94 @@
+import { Box, Button, TextField, Typography, Container, Toolbar, Link, Paper, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import React, { useEffect, useState } from 'react'
+import http from '../../../http';
+import Itag from '../../../interfaces/ITag';
+import IRestaurante from '../../../interfaces/IRestaurante';
+
+const FormularioPrato = () => {
+    const [nomePrato, setNomePrato] = useState('')
+    const [descricao, setDescricao] = useState('')
+
+    const [tag, setTag] = useState('')
+    const [restaurante, setRestaurante] = useState('')
+
+    const [imagem, setImagem] = useState<File | null>(null)
+
+    const [tags, setTags] = useState<Itag[]>([])
+    const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([])
+
+    useEffect(() => {
+        http.get<{ tags: Itag[] }>('tags/').then(resposta => setTags(resposta.data.tags))
+        http.get<IRestaurante[]>('restaurantes/').then(resposta => setRestaurantes(resposta.data))
+    }, [])
+
+    const selecionarArquivo = (evento: React.ChangeEvent<HTMLInputElement>) => {
+        if (evento.target.files?.length) {
+            setImagem(evento.target.files[0])
+        } else {
+            setImagem(null)
+        }
+    }
+
+    const onSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+    }
+
+    return (
+        <>
+            <Box>
+                <Container maxWidth='lg' sx={{ marginTop: 1 }}>
+                    <Paper sx={{ p: 2 }}>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1 }}>
+                            <Typography component="h1" variant="h6">Formulário Pratos</Typography>
+                            <Box component='form' sx={{ width: "100%" }} onSubmit={onSubmitForm}>
+                                <TextField value={nomePrato}
+                                    onChange={evento => setNomePrato(evento.target.value)}
+                                    label="cadastrar Prato"
+                                    variant="standard"
+                                    fullWidth
+                                    required
+                                    margin="dense"
+                                />
+
+                                <TextField value={descricao}
+                                    onChange={evento => setDescricao(evento.target.value)}
+                                    label="cadastrar Descrição"
+                                    variant="standard"
+                                    fullWidth
+                                    required
+                                    margin="dense"
+                                />
+
+                                {/* entender */}
+                                <FormControl margin="dense" fullWidth>
+                                    <InputLabel id="select-tag">Tag</InputLabel>
+                                    <Select labelId='select-tag' value={tag} onChange={evento => { setTag(evento.target.value) }} >
+                                        {tags.map(tag => <MenuItem value={tag.id} key={tag.id}>
+                                            {tag.value}
+                                        </MenuItem>)}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl margin="dense" fullWidth>
+                                    <InputLabel id="select-restaurante">Tag</InputLabel>
+                                    <Select labelId='select-restaurante' value={restaurante} onChange={evento => { setRestaurante(evento.target.value) }} >
+                                        {restaurantes.map(restaurante => <MenuItem value={restaurante.id} key={restaurante.id}>
+                                            {restaurante.nome}
+                                        </MenuItem>)}
+                                    </Select>
+                                </FormControl>
+                                <input type="file" onChange={selecionarArquivo} />
+                                <Button sx={{ marginTop: 1 }} type='submit' fullWidth variant="outlined">Salvar</Button>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Container>
+            </Box>
+
+
+        </>
+    )
+}
+
+export default FormularioPrato
