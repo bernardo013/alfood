@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import IRestaurante from '../../../interfaces/IRestaurante';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import axios from 'axios';
-import { IPaginacao } from '../../../interfaces/IPaginacao';
-import { Link } from 'react-router-dom';
+import { Button ,Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link} from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import http from '../../../http';
 
 const AdministracaoRestaurante = () => {
 
-const [restaurantes, setRestaurante] = useState<IRestaurante[]>( [] )
+const [restaurantes, setRestaurante] = useState<IRestaurante[]>( [])
 
 useEffect(() => {
-    axios.get<IRestaurante[]>("http://localhost:8000/api/v2/restaurantes/")
+    http.get<IRestaurante[]>("restaurantes/")
     .then(response => {
         setRestaurante(response.data)
     })
@@ -19,6 +18,13 @@ useEffect(() => {
     })
 },[])
 
+const excluir = (restauranteParaSerExcluido: IRestaurante) => {
+    http.delete(`restaurantes/${restauranteParaSerExcluido.id}/`)
+    .then( () => {
+        const listaRestaurante = restaurantes.filter(restaurante => restaurante.id !== restauranteParaSerExcluido.id)
+            setRestaurante([ ...listaRestaurante ])
+        })
+}
     return (
         <TableContainer component={Paper}>
             <Table>
@@ -38,11 +44,15 @@ useEffect(() => {
                             {restaurante.nome}
                         </TableCell>
                         <TableCell>
-                            [<Link to={`/admin/restaurantes/${restaurante.id}`}>Editar</Link>]
+                            [<RouterLink to={`/admin/restaurantes/${restaurante.id}`}>Editar</RouterLink>]
+                        </TableCell>
+                        <TableCell>
+                            <Button variant='outlined' color='error' onClick={() => {excluir(restaurante)}}>Excluir</Button> 
                         </TableCell>
                     </TableRow>)}
                 </TableBody>
             </Table>
+
         </TableContainer>
     );
 };
