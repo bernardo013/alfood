@@ -16,10 +16,15 @@ const FormularioPrato = () => {
     const [tags, setTags] = useState<Itag[]>([])
     const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([])
 
+
+
     useEffect(() => {
         http.get<{ tags: Itag[] }>('tags/').then(resposta => setTags(resposta.data.tags))
         http.get<IRestaurante[]>('restaurantes/').then(resposta => setRestaurantes(resposta.data))
     }, [])
+
+
+
 
     const selecionarArquivo = (evento: React.ChangeEvent<HTMLInputElement>) => {
         if (evento.target.files?.length) {
@@ -29,10 +34,30 @@ const FormularioPrato = () => {
         }
     }
 
+
+
     const onSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+        const formData = new FormData()
+        formData.append('nome', nomePrato)
+        formData.append('descricao', descricao)
+        formData.append('tag', tag)
+        formData.append('restaurante', restaurante)
+        if (imagem) { formData.append('imagem', imagem) }
+
+        http.request({
+            url: 'pratos/',
+            method: "POST",
+            headers: { 'Content-Type': 'multipart/form-data' },
+            data: formData
+        })
+            .then(resposta => alert("prato cadastrador com sucesso"))
+            .catch(err => console.log(err))
+
     }
 
+
+    
     return (
         <>
             <Box>
@@ -60,18 +85,18 @@ const FormularioPrato = () => {
                                     margin="dense"
                                 />
 
-                                {/* entender */}
+
                                 <FormControl margin="dense" fullWidth>
                                     <InputLabel id="select-tag">Tag</InputLabel>
                                     <Select labelId='select-tag' value={tag} onChange={evento => { setTag(evento.target.value) }} >
-                                        {tags.map(tag => <MenuItem value={tag.id} key={tag.id}>
+                                        {tags.map(tag => <MenuItem value={tag.value} key={tag.id}>
                                             {tag.value}
                                         </MenuItem>)}
                                     </Select>
                                 </FormControl>
 
                                 <FormControl margin="dense" fullWidth>
-                                    <InputLabel id="select-restaurante">Tag</InputLabel>
+                                    <InputLabel id="select-restaurante">Restaurante</InputLabel>
                                     <Select labelId='select-restaurante' value={restaurante} onChange={evento => { setRestaurante(evento.target.value) }} >
                                         {restaurantes.map(restaurante => <MenuItem value={restaurante.id} key={restaurante.id}>
                                             {restaurante.nome}
